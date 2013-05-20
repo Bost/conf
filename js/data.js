@@ -124,10 +124,12 @@ var controls;
 var objects = [];
 var targets = { table: [], sphere: [], helix: [], grid: [] };
 
-init();
-animate();
+function go(panelId) {
+    init(panelId);
+    animate();
+}
 
-function init() {
+function init(panelId) {
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
     camera.position.z = 1800;
     scene = new THREE.Scene();
@@ -214,7 +216,39 @@ function init() {
     renderer = new THREE.CSS3DRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.domElement.style.position = 'absolute';
-    document.getElementById( 'container' ).appendChild( renderer.domElement );
+    var layoutEl = document.getElementById(panelId);
+
+    //create(layoutEl, 'container');
+    var container = document.createElement( 'div' );
+    container.id='info';
+    layoutEl.appendChild(container);
+
+    var menuContainer = document.createElement( 'div' );
+    menuContainer.id='menu';
+    layoutEl.appendChild(menuContainer);
+
+    var btnTable = document.createElement( 'button' );
+    btnTable.id='table';
+    menuContainer.appendChild(btnTable);
+
+    var btnTable = document.createElement( 'button' );
+    btnTable.id='sphere';
+    menuContainer.appendChild(btnTable);
+
+    var btnTable = document.createElement( 'button' );
+    btnTable.id='helix';
+    menuContainer.appendChild(btnTable);
+
+    var btnTable = document.createElement( 'button' );
+    btnTable.id='grid';
+    menuContainer.appendChild(btnTable);
+
+    var contentNode = layoutEl.childNodes.item(5);
+    contentNode.id = 'container';
+    //console.log('contentNode: '+contentNode);
+    contentNode.innerHTML = '';
+    // TODO backgroung-color inline definition overrides the css definition
+    contentNode.appendChild( renderer.domElement );
 
     //
     controls = new THREE.TrackballControls( camera, renderer.domElement );
