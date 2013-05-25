@@ -124,12 +124,16 @@ var controls;
 var objects = [];
 var targets = { table: [], sphere: [], helix: [], grid: [] };
 
-function go(panelId) {
-    init(panelId);
+function draw(mainW2uiId, topW2uiId) {
+    init(mainW2uiId, topW2uiId);
     animate();
 }
 
-function init(panelId) {
+function newEl(el) {
+    el.appendChild(document.createElement( 'div' ));
+}
+
+function init(mainW2uiId, topW2uiId) {
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
     camera.position.z = 1800;
     scene = new THREE.Scene();
@@ -216,16 +220,19 @@ function init(panelId) {
     renderer = new THREE.CSS3DRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.domElement.style.position = 'absolute';
-    var layoutEl = document.getElementById(panelId);
+    var mainW2uiEl = document.getElementById(mainW2uiId);
+    var topW2uiEl = document.getElementById(topW2uiId);
 
-    //create(layoutEl, 'container');
-    var container = document.createElement( 'div' );
-    container.id='info';
-    layoutEl.appendChild(container);
+    //newEl(mainW2uiId);
+    //newEl(topW2uiId);
+    var m = document.createElement( 'div' );
+    mainW2uiEl.appendChild(m);
+    var t = document.createElement( 'div' );
+    mainW2uiEl.appendChild(t);
 
     var menuContainer = document.createElement( 'div' );
     menuContainer.id='menu';
-    layoutEl.appendChild(menuContainer);
+    mainW2uiEl.appendChild(menuContainer);
 
     var btnTable = document.createElement( 'button' );
     btnTable.id='table';
@@ -243,9 +250,16 @@ function init(panelId) {
     btnTable.id='grid';
     menuContainer.appendChild(btnTable);
 
-    var contentNode = layoutEl.childNodes.item(5);
+    // TODO the 5 is a hack
+    var topNode = topW2uiEl.childNodes.item(5);
+    topNode.id = 'topContainer';
+    topNode.innerHTML = 'foo';
+
+    var contentNode = mainW2uiEl.childNodes.item(5);
     contentNode.id = 'container';
     //console.log('contentNode: '+contentNode);
+    // w2ui uses inline css for background-color. it overrides the setting from css-file.
+    $('#'+contentNode.id).css('background-color', '');
     contentNode.innerHTML = '';
     // TODO backgroung-color inline definition overrides the css definition
     contentNode.appendChild( renderer.domElement );
@@ -278,6 +292,28 @@ function init(panelId) {
     button.addEventListener( 'click', function ( event ) {
         transform( targets.grid, shuffle_timeout );
     }, false );
+
+
+    var t = $('#topContainer');
+    t.w2toolbar({
+            name: 'toolbar',
+            items: [
+                { type: 'check',  id: 'item1', caption: 'Check', img: 'icon-add', checked: true },
+                { type: 'break' },
+                { type: 'menu',   id: 'item2', caption: 'Drop Down', img: 'icon-folder', items: [
+                        { text: 'Item 1', icon: 'icon-page' },
+                        { text: 'Item 2', icon: 'icon-page' },
+                        { text: 'Item 3', icon: 'icon-page' }
+                ]},
+                { type: 'break' },
+                { type: 'radio',  id: 'item3',  group: '1', caption: 'Radio 1', img: 'icon-page' },
+                { type: 'radio',  id: 'item4',  group: '1', caption: 'Radio 2', img: 'icon-page' },
+                { type: 'spacer' },
+                { type: 'button',  id: 'item5',  caption: 'Item 5', img: 'icon-save' }
+            ]
+    });
+
+
 
     transform( targets.table, startup_timeout );
     window.addEventListener( 'resize', onWindowResize, false );
