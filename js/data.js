@@ -134,21 +134,26 @@ function newEl(el) {
 }
 
 function action(s) {
-    console.log(s);
+    //console.log(s);
     w2ui['layout'].content('bottom', s);
 }
 
 function init(mainW2uiId, topW2uiId, leftW2uiId) {
-    var pstyle = 'background-color: #F5F6F7; border: 1px solid #dfdfdf; padding: 5px;';
+
+    var border = 1;
+    var padding = 5;
+    var basicSstyle = 'border: '+border+'px solid #dfdfdf; padding: '+padding+'px;';
+    var pstyle     = basicSstyle + 'background-color: #F5F6F7;';
+    var mainStyle  = basicSstyle + 'background-color: #000000;'; // this overrides the backgroundColor from the chem. table
     $('#layout').w2layout({
         name: 'layout',
         panels: [
-            { type: 'top',  id: 'top', size: 50, resizable: true, style: pstyle },     //, content: 'top'
-            { type: 'left', id: 'left', size: 200, resizable: true, style: pstyle },   //, content: 'left'
-            { type: 'main', id: 'main', resizable: true, style: pstyle },              //, content: 'main'
+            { type: 'top',  name: 'top', size: 50, resizable: true, style: pstyle },     //, content: 'top'
+            { type: 'left', name: 'left', size: 200, resizable: true, style: pstyle },   //, content: 'left'
+            { type: 'main', name: 'main', resizable: true, style: mainStyle },           //, content: 'main'
             //{ type: 'preview', size: '50%', resizable: true, style: pstyle, content: 'preview' },
             //{ type: 'right', size: 200, resizable: true, style: pstyle, content: 'right' },
-            { type: 'bottom', id: 'bottom', size: 50, resizable: true, style: pstyle } //, content: 'bottom'
+            { type: 'bottom', name: 'bottom', size: 50, resizable: true, style: pstyle } //, content: 'bottom'
         ]
     });
 
@@ -219,8 +224,9 @@ function init(mainW2uiId, topW2uiId, leftW2uiId) {
         details.className = 'details';
         details.innerHTML = item[ 1 ] + '<br>' + item[ 2 ];
         element.appendChild( details );
-        element.onclick = new Function("action('"+(item[1]+'--'+item[2])+"');");
-        element.onmouseover = new Function("action('"+(item[1]+' '+item[2])+"');");
+        var sAction = "action('"+(item[1]+' '+item[2])+"');";
+        element.onmouseover = new Function(sAction);
+        element.onmouseover = new Function(sAction);
 
         var object = new THREE.CSS3DObject( element );
         object.position.x = Math.random() * 4000 - 2000;
@@ -280,31 +286,46 @@ function init(mainW2uiId, topW2uiId, leftW2uiId) {
 
     //
     renderer = new THREE.CSS3DRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    var mainEl = w2ui['layout'].get('main');
+    // TODO the 4*(border + padding) multiplications are strange
+    var width = mainEl.width - 4*(border + padding);
+    var height = mainEl.height - 2*(border + padding);
+
+    //var winWidth = window.innerWidth;
+    //var winHeight = window.innerHeight;
+    //console.log('winWidth: '+winWidth+ '; width: '+width+'; winHeight: '+winHeight+'; height: '+height)
+
+    renderer.setSize( width, height );
     renderer.domElement.style.position = 'absolute';
-    var mainW2uiEl = document.getElementById(mainW2uiId);
-    var topW2uiEl = document.getElementById(topW2uiId);
-    var leftW2uiEl = document.getElementById(leftW2uiId);
+    var mainDomEl = renderer.domElement;
+    //var mainW2uiEl = document.getElementById(mainW2uiId);
 
     var menuContainer = document.createElement( 'div' );
     menuContainer.id='menu';
-    mainW2uiEl.appendChild(menuContainer);
+    //mainW2uiEl.appendChild(menuContainer);
+    mainDomEl.appendChild(menuContainer);
+    w2ui['layout'].content('main', mainDomEl);
 
-    var btnTable = document.createElement( 'button' );
-    btnTable.id='table';
-    menuContainer.appendChild(btnTable);
+    jQuery('<button/>', {
+        id: 'table',
+        text: 'table'
+    }).appendTo(menuContainer);
 
-    var btnTable = document.createElement( 'button' );
-    btnTable.id='sphere';
-    menuContainer.appendChild(btnTable);
+    jQuery('<button/>', {
+        id: 'sphere',
+        text: 'sphere'
+    }).appendTo(menuContainer);
 
-    var btnTable = document.createElement( 'button' );
-    btnTable.id='helix';
-    menuContainer.appendChild(btnTable);
+    jQuery('<button/>', {
+        id: 'helix',
+        text: 'helix'
+    }).appendTo(menuContainer);
 
-    var btnTable = document.createElement( 'button' );
-    btnTable.id='grid';
-    menuContainer.appendChild(btnTable);
+    jQuery('<button/>', {
+        id: 'grid',
+        text: 'grid'
+    }).appendTo(menuContainer);
+
 
     //
     controls = new THREE.TrackballControls( camera, renderer.domElement );
@@ -315,38 +336,22 @@ function init(mainW2uiId, topW2uiId, leftW2uiId) {
     // unmixing duration on start up
     var startup_timeout = shuffle_timeout;
 
-    var button = document.getElementById( 'table' );
-    button.addEventListener( 'click', function ( event ) {
+    $('#table')[0].addEventListener( 'click', function ( event ) {
         transform( targets.table, shuffle_timeout );
     }, false );
 
-    var button = document.getElementById( 'sphere' );
-    button.addEventListener( 'click', function ( event ) {
+    $('#sphere')[0].addEventListener( 'click', function ( event ) {
         transform( targets.sphere, shuffle_timeout );
     }, false );
 
-    var button = document.getElementById( 'helix' );
-    button.addEventListener( 'click', function ( event ) {
+    $('#helix')[0].addEventListener( 'click', function ( event ) {
         transform( targets.helix, shuffle_timeout );
     }, false );
 
-    var button = document.getElementById( 'grid' );
-    button.addEventListener( 'click', function ( event ) {
+    $('#grid')[0].addEventListener( 'click', function ( event ) {
         transform( targets.grid, shuffle_timeout );
     }, false );
 
-
-//----------------
-    // TODO the 5 is a hack
-    var condentIdx = 5;
-
-    var contentNode = mainW2uiEl.childNodes.item(condentIdx);
-    contentNode.id = 'container';
-    //console.log('contentNode: '+contentNode);
-    // w2ui uses inline css for background-color. it overrides the setting from css-file.
-    $('#'+contentNode.id).css('background-color', '');
-    contentNode.innerHTML = '';
-    contentNode.appendChild( renderer.domElement );
 
     transform( targets.table, startup_timeout );
     window.addEventListener( 'resize', onWindowResize, false );
