@@ -14,54 +14,7 @@
     <script src="js/renderer/CSS3DRenderer.js"></script>
     <script src="js/data.js"></script>
 </head>
-<body>
-
-        <div id="layout" style="width: 95%; height: 400px;">
-        </div>
-
-        <div style="height: 10px;"></div>
-
-        <span style="display: inline-block; width: 50px;"> Main: </span>
-        <input type="button" value="Set Content" onclick="draw('layout_layout_panel_main', 'layout_layout_panel_top')">
-
+<body onload="draw('layout_layout_panel_main', 'layout_layout_panel_top', 'layout_layout_panel_left')">
+    <div id="layout" style="height: 960px;"></div>
 </body>
-<script>
-$(function () {
-    var pstyle = 'background-color: #F5F6F7; border: 1px solid #dfdfdf; padding: 5px;';
-    $('#layout').w2layout({
-        name: 'layout',
-        panels: [
-            { type: 'top',  size: 50, resizable: true, style: pstyle, content: 'top' },
-            { type: 'left', size: 200, resizable: true, style: pstyle, content: 'left' },
-            { type: 'main', style: pstyle, content: 'main' },
-            //{ type: 'preview', size: '50%', resizable: true, style: pstyle, content: 'preview' },
-            { type: 'right', size: 200, resizable: true, style: pstyle, content: 'right' },
-            { type: 'bottom', size: 50, resizable: true, style: pstyle, content: 'bottom' }
-        ]
-    });
-
-
-
-    /*
-    var t = $('#top');
-    t.w2toolbar({
-            name: 'toolbar',
-            items: [
-                { type: 'check',  id: 'item1', caption: 'Check', img: 'icon-add', checked: true },
-                { type: 'break' },
-                { type: 'menu',   id: 'item2', caption: 'Drop Down', img: 'icon-folder', items: [
-                        { text: 'Item 1', icon: 'icon-page' },
-                        { text: 'Item 2', icon: 'icon-page' },
-                        { text: 'Item 3', icon: 'icon-page' }
-                ]},
-                { type: 'break' },
-                { type: 'radio',  id: 'item3',  group: '1', caption: 'Radio 1', img: 'icon-page' },
-                { type: 'radio',  id: 'item4',  group: '1', caption: 'Radio 2', img: 'icon-page' },
-                { type: 'spacer' },
-                { type: 'button',  id: 'item5',  caption: 'Item 5', img: 'icon-save' }
-            ]
-    });
-    */
-});
-</script>
 </html>

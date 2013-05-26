@@ -124,8 +124,8 @@ var controls;
 var objects = [];
 var targets = { table: [], sphere: [], helix: [], grid: [] };
 
-function draw(mainW2uiId, topW2uiId) {
-    init(mainW2uiId, topW2uiId);
+function draw(mainW2uiId, topW2uiId, leftW2uiId) {
+    init(mainW2uiId, topW2uiId, leftW2uiId);
     animate();
 }
 
@@ -133,7 +133,68 @@ function newEl(el) {
     el.appendChild(document.createElement( 'div' ));
 }
 
-function init(mainW2uiId, topW2uiId) {
+function action(s) {
+    console.log(s);
+    w2ui['layout'].content('bottom', s);
+}
+
+function init(mainW2uiId, topW2uiId, leftW2uiId) {
+    var pstyle = 'background-color: #F5F6F7; border: 1px solid #dfdfdf; padding: 5px;';
+    $('#layout').w2layout({
+        name: 'layout',
+        panels: [
+            { type: 'top',  id: 'top', size: 50, resizable: true, style: pstyle },     //, content: 'top'
+            { type: 'left', id: 'left', size: 200, resizable: true, style: pstyle },   //, content: 'left'
+            { type: 'main', id: 'main', resizable: true, style: pstyle },              //, content: 'main'
+            //{ type: 'preview', size: '50%', resizable: true, style: pstyle, content: 'preview' },
+            //{ type: 'right', size: 200, resizable: true, style: pstyle, content: 'right' },
+            { type: 'bottom', id: 'bottom', size: 50, resizable: true, style: pstyle } //, content: 'bottom'
+        ]
+    });
+
+    var contentTop = $().w2toolbar({
+        name: 'toolbar',
+        items: [
+            { type: 'check',  id: 'item1', caption: 'Check', img: 'icon-add', checked: true },
+            { type: 'break' },
+            { type: 'menu',   id: 'item2', caption: 'Drop Down', img: 'icon-folder', items: [
+                    { text: 'Item 1', icon: 'icon-page' },
+                    { text: 'Item 2', icon: 'icon-page' },
+                    { text: 'Item 3', icon: 'icon-page' }
+            ]},
+            { type: 'break' },
+            { type: 'radio',  id: 'item3',  group: '1', caption: 'Radio 1', img: 'icon-page' },
+            { type: 'radio',  id: 'item4',  group: '1', caption: 'Radio 2', img: 'icon-page' },
+            { type: 'spacer' },
+            { type: 'button',  id: 'item5',  caption: 'Item 5', img: 'icon-save' }
+        ]
+    });
+    w2ui['layout'].content('top', contentTop);
+
+    var contentLeft = $().w2sidebar({
+        name: 'sidebar',
+        nodes: [
+            { id: 'level-1', text: 'Level 1', img: 'icon-folder', expanded: true, group: true,
+              nodes: [ { id: 'level-1-1', text: 'Level 1.1', img: 'icon-page' },
+                       { id: 'level-1-2', text: 'Level 1.2', img: 'icon-page' },
+                       { id: 'level-1-3', text: 'Level 1.3', img: 'icon-page' }
+                     ]
+            },
+            { id: 'level-2', text: 'Level 2', img: 'icon-folder', expanded: true, group: true,
+              nodes: [ { id: 'level-2-1', text: 'Level 2.1', img: 'icon-folder', count: 3,
+                         nodes: [
+                           { id: 'level-2-1-1', text: 'Level 2.1.1', img: 'icon-page' },
+                           { id: 'level-2-1-2', text: 'Level 2.1.2', img: 'icon-page', count: 67 },
+                           { id: 'level-2-1-3', text: 'Level 2.1.3', img: 'icon-page' }
+                     ]},
+                       { id: 'level-2-2', text: 'Level 2.2', img: 'icon-page' },
+                       { id: 'level-2-3', text: 'Level 2.3', img: 'icon-page' }
+                     ]
+            }
+        ]
+    });
+    w2ui['layout'].content('left', contentLeft);
+
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
     camera.position.z = 1800;
     scene = new THREE.Scene();
@@ -143,7 +204,6 @@ function init(mainW2uiId, topW2uiId) {
         var element = document.createElement( 'div' );
         element.className = 'element';
         element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
-        //element.style.backgroundColor = 'green';
 
         var number = document.createElement( 'div' );
         number.className = 'number';
@@ -159,6 +219,8 @@ function init(mainW2uiId, topW2uiId) {
         details.className = 'details';
         details.innerHTML = item[ 1 ] + '<br>' + item[ 2 ];
         element.appendChild( details );
+        element.onclick = new Function("action('"+(item[1]+'--'+item[2])+"');");
+        element.onmouseover = new Function("action('"+(item[1]+' '+item[2])+"');");
 
         var object = new THREE.CSS3DObject( element );
         object.position.x = Math.random() * 4000 - 2000;
@@ -222,13 +284,7 @@ function init(mainW2uiId, topW2uiId) {
     renderer.domElement.style.position = 'absolute';
     var mainW2uiEl = document.getElementById(mainW2uiId);
     var topW2uiEl = document.getElementById(topW2uiId);
-
-    //newEl(mainW2uiId);
-    //newEl(topW2uiId);
-    var m = document.createElement( 'div' );
-    mainW2uiEl.appendChild(m);
-    var t = document.createElement( 'div' );
-    mainW2uiEl.appendChild(t);
+    var leftW2uiEl = document.getElementById(leftW2uiId);
 
     var menuContainer = document.createElement( 'div' );
     menuContainer.id='menu';
@@ -249,20 +305,6 @@ function init(mainW2uiId, topW2uiId) {
     var btnTable = document.createElement( 'button' );
     btnTable.id='grid';
     menuContainer.appendChild(btnTable);
-
-    // TODO the 5 is a hack
-    var topNode = topW2uiEl.childNodes.item(5);
-    topNode.id = 'topContainer';
-    topNode.innerHTML = 'foo';
-
-    var contentNode = mainW2uiEl.childNodes.item(5);
-    contentNode.id = 'container';
-    //console.log('contentNode: '+contentNode);
-    // w2ui uses inline css for background-color. it overrides the setting from css-file.
-    $('#'+contentNode.id).css('background-color', '');
-    contentNode.innerHTML = '';
-    // TODO backgroung-color inline definition overrides the css definition
-    contentNode.appendChild( renderer.domElement );
 
     //
     controls = new THREE.TrackballControls( camera, renderer.domElement );
@@ -294,26 +336,17 @@ function init(mainW2uiId, topW2uiId) {
     }, false );
 
 
-    var t = $('#topContainer');
-    t.w2toolbar({
-            name: 'toolbar',
-            items: [
-                { type: 'check',  id: 'item1', caption: 'Check', img: 'icon-add', checked: true },
-                { type: 'break' },
-                { type: 'menu',   id: 'item2', caption: 'Drop Down', img: 'icon-folder', items: [
-                        { text: 'Item 1', icon: 'icon-page' },
-                        { text: 'Item 2', icon: 'icon-page' },
-                        { text: 'Item 3', icon: 'icon-page' }
-                ]},
-                { type: 'break' },
-                { type: 'radio',  id: 'item3',  group: '1', caption: 'Radio 1', img: 'icon-page' },
-                { type: 'radio',  id: 'item4',  group: '1', caption: 'Radio 2', img: 'icon-page' },
-                { type: 'spacer' },
-                { type: 'button',  id: 'item5',  caption: 'Item 5', img: 'icon-save' }
-            ]
-    });
+//----------------
+    // TODO the 5 is a hack
+    var condentIdx = 5;
 
-
+    var contentNode = mainW2uiEl.childNodes.item(condentIdx);
+    contentNode.id = 'container';
+    //console.log('contentNode: '+contentNode);
+    // w2ui uses inline css for background-color. it overrides the setting from css-file.
+    $('#'+contentNode.id).css('background-color', '');
+    contentNode.innerHTML = '';
+    contentNode.appendChild( renderer.domElement );
 
     transform( targets.table, startup_timeout );
     window.addEventListener( 'resize', onWindowResize, false );
